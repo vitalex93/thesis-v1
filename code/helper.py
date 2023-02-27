@@ -62,7 +62,20 @@ def get_column_values(filename, sheetname, column_letter):
     # Get the values in the column
     column = sheet[column_letter]
     values = [cell.value for cell in column]
+    values = [value for value in values if value is not None]
     
     # Return the list of values
     return values
+
+
+def calculate_percentage(first_list, second_list):
+    common_items = set(first_list) & set(second_list)
+    percentage = len(common_items) / len(first_list) * 100
+    return percentage
+
+
+def get_first_n_keys(dictionary, n):
+    keys_list = list(dictionary.keys())[:n]
+    return keys_list
+
 
