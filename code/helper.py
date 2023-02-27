@@ -1,5 +1,6 @@
 from textmodels import *
 import pandas as pd
+import openpyxl
 
 def get_similarity_scores(text, documents, encoding_method,cols=['Descriptions'],path='../reports/corpus.xlsx'):
     # Initialize TextModels object
@@ -48,4 +49,20 @@ def similarities_df(docs, group, encoding_method, cols=['Descriptions'], path='.
     df = pd.DataFrame.from_dict(similarities)
     #df = df.T
     return df
+
+
+
+def get_column_values(filename, sheetname, column_letter):
+    # Load the workbook
+    wb = openpyxl.load_workbook(filename)
+    
+    # Select the sheet
+    sheet = wb[sheetname]
+    
+    # Get the values in the column
+    column = sheet[column_letter]
+    values = [cell.value for cell in column]
+    
+    # Return the list of values
+    return values
 
