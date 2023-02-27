@@ -44,7 +44,8 @@ def similarities_df(docs, group, encoding_method, cols=['Descriptions'], path='.
     similarities = {}
     for doc in docs:
         similarities[doc] = get_similarity_scores(doc, group, encoding_method)
-    df = pd.DataFrame.from_dict(similarities, orient='index', columns=group)
-    df = df.T
+    #df = pd.DataFrame.from_dict(similarities, orient='index', columns=group)
+    df = pd.DataFrame.from_dict(similarities)
+    #df = df.T
     return df
 
