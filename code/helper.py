@@ -86,6 +86,18 @@ def get_similarities_for_values(values, docs, encoding_method, n):
     return similarities_dict
 
 
+def save_df_to_excel(dataframe, file_name, sheet_name):
+    # create an Excel writer object
+    writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
+
+    # write the dataframe to a specific sheet
+    dataframe.to_excel(writer, sheet_name=sheet_name)
+
+    # save the file
+    writer.save()
+
+
+
 
 
 
