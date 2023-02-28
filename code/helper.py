@@ -79,3 +79,13 @@ def get_first_n_keys(dictionary, n):
     return keys_list
 
 
+def get_similarities_for_values(values, docs, encoding_method, n):
+    similarities_dict = {}
+    for value in values:
+        similarities_dict[value] = get_first_n_keys(get_similarity_scores(value, docs, encoding_method), n)
+    return similarities_dict
+
+
+
+
+
