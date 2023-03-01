@@ -171,9 +171,40 @@ def results_to_targets(descriptions, targets, model, n, path='../reports/corpus.
                     'R8':get_column_values(path, 'R8', 'C'),
                     'R9':get_column_values(path, 'R9', 'C')}
 
-    matched = match_lists(results[i], ground_truth)
+    matched = common_items(results[i], ground_truth)
 
     return matched
+
+
+
+def common_items(input_list, input_dict):
+    """
+    Returns a dictionary with the common items between the input list and each value list in the input dictionary.
+
+    Parameters:
+    -----------
+    input_list : list
+        The input list to compare with the values of the input dictionary.
+    input_dict : dict
+        The input dictionary with lists as values to compare with the input list.
+
+    Returns:
+    --------
+    dict
+        A dictionary with the keys of the input dictionary as keys and the common items as values.
+    """
+    # Initialize an empty dictionary to store the result
+    result = {}
+
+    # Loop over the items in the input dictionary
+    for key, value in input_dict.items():
+        # Find the common items between the input list and the current value list
+        common = set(input_list).intersection(set(value))
+        # Add the common items to the result dictionary with the current key as key
+        result[key] = list(common)
+
+    return result
+
 
 
 
