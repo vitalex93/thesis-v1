@@ -1,6 +1,7 @@
 from textmodels import *
 import pandas as pd
 import openpyxl
+from collections import Counter
 
 def get_similarity_scores(text, documents, encoding_method,cols=['Descriptions'],path='../reports/corpus.xlsx'):
     # Initialize TextModels object
@@ -95,6 +96,86 @@ def save_df_to_excel(dataframe, file_name, sheet_name):
 
     # save the file
     writer.save()
+
+
+def match_lists(lst, dct):
+    """
+    Matches each item in `lst` with the list in `dct` that has the most common items.
+    Returns a dictionary with the item of `lst` as key and the keys of `dct` as values.
+    """
+    # Create a dictionary to store the counts of each item in the lists in `dct`
+    counts = {}
+    for k, v in dct.items():
+        counts[k] = Counter(v)
+    
+    # Find the list in `dct` with the most common items for each item in `lst`
+    matches = {}
+    for item in lst:
+        max_count = 0
+        max_list = None
+        for k, v in counts.items():
+            count = v.get(item, 0)
+            if count > max_count:
+                max_count = count
+                max_list = k
+        matches[item] = max_list
+    
+    # Return a dictionary with the keys of `dct` as values
+    result = {}
+    for k in dct.keys():
+        result[k] = [item for item, lst in matches.items() if lst == k]
+    
+    return result
+
+
+
+
+def df_to_lists(df):
+    """
+    Convert all columns of a Pandas DataFrame to lists.
+
+    Parameters:
+    -----------
+    df : pandas.DataFrame
+        The DataFrame to convert to lists.
+
+    Returns:
+    --------
+    list
+        A list of lists, where each inner list corresponds to one column of the DataFrame.
+    """
+    # Initialize an empty list to store the result
+    result = []
+
+    # Loop over the columns of the DataFrame and convert each one to a list
+    for col in df.columns:
+        col_list = df[col].tolist()
+        result.append(col_list)
+
+    return result
+
+
+def results_to_targets(descriptions, targets, model, n, path='../reports/corpus.xlsx', i=0):
+    
+    results_dict = get_similarities_for_values(descriptions,targets,model,n)
+    results_df = pd.DataFrame.from_dict(results_dict)
+
+    results = df_to_lists(results_df)
+    ground_truth = {'R1':get_column_values(path, 'R1', 'C'),
+                    'R2':get_column_values(path, 'R2', 'C'),
+                    'R3':get_column_values(path, 'R3', 'C'),
+                    'R4':get_column_values(path, 'R4', 'C'),
+                    'R5':get_column_values(path, 'R5', 'C'),
+                    'R6':get_column_values(path, 'R6', 'C'),
+                    'R7':get_column_values(path, 'R7', 'C'),
+                    'R8':get_column_values(path, 'R8', 'C'),
+                    'R9':get_column_values(path, 'R9', 'C')}
+
+    matched = match_lists(results[i], ground_truth)
+
+    return matched
+
+
 
 
 
