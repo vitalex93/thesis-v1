@@ -31,8 +31,18 @@ def preprocess_text(text):
     words = [lemmatizer.lemmatize(word) for word in words]
     
     # Join words back into a string
-    text = ' '.join(words)
+    #text = ' '.join(words)
     
-    return text
+    return words
 
 
+def get_unique_items(list1, list2):
+    # Find the intersection of the two lists
+    intersection = set(list1) & set(list2)
+
+    # Find the items that are unique to each list
+    unique_list1 = [item for item in list1 if item not in intersection]
+    unique_list2 = [item for item in list2 if item not in intersection]
+
+    # Return the unique items
+    return unique_list1, unique_list2
