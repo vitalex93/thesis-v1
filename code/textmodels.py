@@ -65,18 +65,34 @@ class TextModels:
         else:
             print("No TF-IDF model to save.")
 
-    def encode(self, text, model, version):
+    def encode(self, text, model, version=None):
         if model == 'bow':
-            tm = joblib.load(version)
-            self.bow_vectorizer = tm
-            doc_bow = self.bow_vectorizer.transform([text])
-            return doc_bow.toarray()[0]
+            sentence_embedding = self.encode_bow(text=text, version=version)
+            return sentence_embedding
         elif model == 'tfidf':
-            tm = joblib.load(version)
-            self.tfidf_vectorizer = tm
-            doc_tfidf = self.tfidf_vectorizer.transform([text])
-            return doc_tfidf.toarray()[0]
-        
+            sentence_embedding = self.encode_tfidf(text=text, version=version)
+            return sentence_embedding
+        elif model == 'word2vec':
+            sentence_embedding = self.encode_word2vec(sentence=text)
+            return sentence_embedding
+        elif model == 'sbert':
+            sentence_embedding = self.encode_sentence_bert(sentence=text)
+            return sentence_embedding 
+
+    def encode_bow(self, text, version='bow_model.joblib'):
+        tm = joblib.load(version)
+        self.bow_vectorizer = tm
+        doc_bow = self.bow_vectorizer.transform([text])
+        return doc_bow.toarray()[0]
+        #OK
+
+    def encode_tfidf(self, text, version='tfidf_model.joblib'):
+        tm = joblib.load(version)
+        self.tfidf_vectorizer = tm
+        doc_tfidf = self.tfidf_vectorizer.transform([text])
+        return doc_tfidf.toarray()[0]
+        #OK
+
     def encode_word2vec(self, sentence):
         # Encode a document using the TF-IDF model
         words = sentence.split()
@@ -90,53 +106,6 @@ class TextModels:
         sentence_embedding = self.sbert_model.encode(sentence, convert_to_numpy =True)
         return sentence_embedding
         #OK
-
-
-
-    '''def build_w2v_model(self):
-        # Build a Word2Vec model from the input columns
-        texts = []
-        for col in self.columns:
-            texts += self.df[col].tolist()
-        sentences = [self.nlp(text.lower()) for text in texts]
-        sentences = [[word.text for word in sentence] for sentence in sentences]
-        self.w2v_model = Word2Vec(sentences, window=self.w2v_window, workers=self.w2v_workers)
-
-
-    def build_cbow_model(self):
-        # Build a CBOW model from the input columns
-        texts = []
-        for col in self.columns:
-            texts += self.df[col].tolist()
-        sentences = [self.nlp(text.lower()) for text in texts]
-        sentences = [[word.text for word in sentence] for sentence in sentences]
-        self.cbow_model = Word2Vec(sentences, window=self.cbow_window, workers=self.w2v_workers, sg=0)
-
-    def encode_bow(self, text):
-        # Encode a document using the BOW model
-        doc_bow = self.bow_vectorizer.transform([text])
-        return doc_bow.toarray()[0]
-        #OK'''
-
-
-
-    '''def encode_tfidf(self, text):
-        # Encode a document using the TF-IDF model
-        doc_tfidf = self.tfidf_vectorizer.transform([text])
-        return doc_tfidf.toarray()[0]
-        #OK'''
-
-
-    
-    '''def encode_cbow(self, text):
-        # Encode a document using the CBOW model
-        if self.cbow_model is not None:
-            text = [word for word in text.split() if word in self.cbow_model.wv.vocab]
-            doc_cbow = sum(self.cbow_model[text])/len(text)
-        else:
-            print("Error: CBOW model not loaded")
-            doc_cbow = None
-        return doc_cbow'''
 
     def similarities(self, doc1, doc2, model='tfidf'):
         """
@@ -183,7 +152,54 @@ class TextModels:
 
 
 
-        '''['fasttext-wiki-news-subwords-300',
+    '''def build_w2v_model(self):
+        # Build a Word2Vec model from the input columns
+        texts = []
+        for col in self.columns:
+            texts += self.df[col].tolist()
+        sentences = [self.nlp(text.lower()) for text in texts]
+        sentences = [[word.text for word in sentence] for sentence in sentences]
+        self.w2v_model = Word2Vec(sentences, window=self.w2v_window, workers=self.w2v_workers)
+
+
+    def build_cbow_model(self):
+        # Build a CBOW model from the input columns
+        texts = []
+        for col in self.columns:
+            texts += self.df[col].tolist()
+        sentences = [self.nlp(text.lower()) for text in texts]
+        sentences = [[word.text for word in sentence] for sentence in sentences]
+        self.cbow_model = Word2Vec(sentences, window=self.cbow_window, workers=self.w2v_workers, sg=0)
+
+    def encode_bow(self, text):
+        # Encode a document using the BOW model
+        doc_bow = self.bow_vectorizer.transform([text])
+        return doc_bow.toarray()[0]
+        #OK
+
+
+
+    def encode_tfidf(self, text):
+        # Encode a document using the TF-IDF model
+        doc_tfidf = self.tfidf_vectorizer.transform([text])
+        return doc_tfidf.toarray()[0]
+        #OK
+
+
+    
+    def encode_cbow(self, text):
+        # Encode a document using the CBOW model
+        if self.cbow_model is not None:
+            text = [word for word in text.split() if word in self.cbow_model.wv.vocab]
+            doc_cbow = sum(self.cbow_model[text])/len(text)
+        else:
+            print("Error: CBOW model not loaded")
+            doc_cbow = None
+        return doc_cbow
+        
+        
+        
+ ['fasttext-wiki-news-subwords-300',
  'conceptnet-numberbatch-17-06-300',
  'word2vec-ruscorpora-300',
  'word2vec-google-news-300',
@@ -196,4 +212,8 @@ class TextModels:
  'glove-twitter-100',
  'glove-twitter-200',
  '__testing_word2vec-matrix-synopsis']'''
+
+
+
+
 

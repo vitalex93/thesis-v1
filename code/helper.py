@@ -3,67 +3,13 @@ import pandas as pd
 import openpyxl
 from collections import Counter
 
-'''def get_similarity_scores(text, documents, encoding_method,cols=['Descriptions'],path='../reports/corpus.xlsx'):
-    # Initialize TextModels object
-    tm = TextModels(excel_path=path, columns=cols)
-    
-    # Build encoding model based on encoding_method argument
-    if encoding_method == 'bow':
-        tm.build_bow_model()
-        encode_func = tm.encode_bow
-    elif encoding_method == 'tfidf':
-        tm.build_tfidf_model()
-        encode_func = tm.encode_tfidf
-    elif encoding_method == 'word2vec':
-        tm.build_word2vec_model()
-        encode_func = tm.encode_word2vec
-    elif encoding_method == 'sbert':
-        encode_func = tm.encode_sentence_bert
-    elif encoding_method == 'cbow':
-        tm.build_cbow_model()
-        encode_func = tm.encode_cbow
-    else:
-        print("Invalid encoding method")
-        return None
-    
-    # Calculate similarity scores
-    similarity_scores = {}
-    query_encoding = encode_func(text)
-    for doc in documents:
-        doc_encoding = encode_func(doc)
-        similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
-        similarity_scores[doc] = similarity_score
-    
-    # Sort similarity scores in descending order
-    similarity_scores = {k: v for k, v in sorted(similarity_scores.items(), key=lambda item: item[1], reverse=True)}
-    
-    return similarity_scores'''
-
 
 
 def get_similarity_scores(text, documents, encoding_method,
                           version,cols=['Descriptions'],path='../reports/corpus.xlsx'):
     # Initialize TextModels object
     tm = TextModels(excel_path=path, columns=cols)
-    
-    # Build encoding model based on encoding_method argument
-    if encoding_method == 'bow':
-        #tm.build_bow_model()
-        encode_func = tm.encode
-    elif encoding_method == 'tfidf':
-        #tm.build_tfidf_model()
-        encode_func = tm.encode
-    elif encoding_method == 'word2vec':
-        #tm.build_word2vec_model()
-        encode_func = tm.encode_word2vec
-    elif encoding_method == 'sbert':
-        encode_func = tm.encode_sentence_bert
-    elif encoding_method == 'cbow':
-        tm.build_cbow_model()
-        encode_func = tm.encode_cbow
-    else:
-        print("Invalid encoding method")
-        return None
+    encode_func = tm.encode
     
     # Calculate similarity scores
     similarity_scores = {}
@@ -79,8 +25,6 @@ def get_similarity_scores(text, documents, encoding_method,
     return similarity_scores
 
 
-
-
 def similarities_df(docs, group, encoding_method, cols=['Descriptions'], path='../reports/corpus.xlsx'):
     #model = TextModels(path, cols)
     similarities = {}
@@ -90,7 +34,6 @@ def similarities_df(docs, group, encoding_method, cols=['Descriptions'], path='.
     df = pd.DataFrame.from_dict(similarities)
     #df = df.T
     return df
-
 
 
 def get_column_values(filename, sheetname, column_letter):
@@ -168,8 +111,6 @@ def match_lists(lst, dct):
     return result
 
 
-
-
 def df_to_lists(df):
     """
     Convert all columns of a Pandas DataFrame to lists.
@@ -214,7 +155,6 @@ def results_to_targets(descriptions, targets, model, version, n, path='../report
     matched = common_items(results[i], ground_truth)
 
     return matched
-
 
 
 def common_items(input_list, input_dict):
