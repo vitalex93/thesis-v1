@@ -6,6 +6,7 @@ import gensim.downloader as api
 import spacy
 from sentence_transformers import SentenceTransformer
 import numpy as np
+import joblib
 
 
 class TextModels:
@@ -46,6 +47,51 @@ class TextModels:
         self.tfidf_model.fit_transform(texts)
         self.tfidf_vectorizer = self.tfidf_model
         #OK
+    
+    def save_models(self, file_prefix=""):
+        # Save the bag-of-words model
+        if self.bow_model is not None:
+            bow_file_name = file_prefix + "bow_model.joblib"
+            joblib.dump(self.bow_model, bow_file_name)
+            print(f"Bag-of-words model saved to {bow_file_name}")
+        else:
+            print("No bag-of-words model to save.")
+            
+        # Save the TF-IDF model
+        if self.tfidf_model is not None:
+            tfidf_file_name = file_prefix + "tfidf_model.joblib"
+            joblib.dump(self.tfidf_model, tfidf_file_name)
+            print(f"TF-IDF model saved to {tfidf_file_name}")
+        else:
+            print("No TF-IDF model to save.")
+
+    def encode(self, text, model, version):
+        if model == 'bow':
+            tm = joblib.load(version)
+            self.bow_vectorizer = tm
+            doc_bow = self.bow_vectorizer.transform([text])
+            return doc_bow.toarray()[0]
+        elif model == 'tfidf':
+            tm = joblib.load(version)
+            self.tfidf_vectorizer = tm
+            doc_tfidf = self.tfidf_vectorizer.transform([text])
+            return doc_tfidf.toarray()[0]
+        
+    def encode_word2vec(self, sentence):
+        # Encode a document using the TF-IDF model
+        words = sentence.split()
+        embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
+        sentence_embedding = sum(embeddings) / len(embeddings)
+        return sentence_embedding
+        #OK
+
+    def encode_sentence_bert(self, sentence):
+        # Encode a document using pretrained sentence Bert model
+        sentence_embedding = self.sbert_model.encode(sentence, convert_to_numpy =True)
+        return sentence_embedding
+        #OK
+
+
 
     '''def build_w2v_model(self):
         # Build a Word2Vec model from the input columns
@@ -64,36 +110,25 @@ class TextModels:
             texts += self.df[col].tolist()
         sentences = [self.nlp(text.lower()) for text in texts]
         sentences = [[word.text for word in sentence] for sentence in sentences]
-        self.cbow_model = Word2Vec(sentences, window=self.cbow_window, workers=self.w2v_workers, sg=0)'''
+        self.cbow_model = Word2Vec(sentences, window=self.cbow_window, workers=self.w2v_workers, sg=0)
 
     def encode_bow(self, text):
         # Encode a document using the BOW model
         doc_bow = self.bow_vectorizer.transform([text])
         return doc_bow.toarray()[0]
-        #OK
+        #OK'''
 
-    def encode_tfidf(self, text):
+
+
+    '''def encode_tfidf(self, text):
         # Encode a document using the TF-IDF model
         doc_tfidf = self.tfidf_vectorizer.transform([text])
         return doc_tfidf.toarray()[0]
-        #OK
+        #OK'''
 
-    def encode_word2vec(self, sentence):
-        # Encode a document using the TF-IDF model
-        words = sentence.split()
-        embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
-        sentence_embedding = sum(embeddings) / len(embeddings)
-        return sentence_embedding
-        #OK
-
-    def encode_sentence_bert(self, sentence):
-        # Encode a document using pretrained sentence Bert model
-        sentence_embedding = self.sbert_model.encode(sentence, convert_to_numpy =True)
-        return sentence_embedding
-        #OK
 
     
-    def encode_cbow(self, text):
+    '''def encode_cbow(self, text):
         # Encode a document using the CBOW model
         if self.cbow_model is not None:
             text = [word for word in text.split() if word in self.cbow_model.wv.vocab]
@@ -101,7 +136,7 @@ class TextModels:
         else:
             print("Error: CBOW model not loaded")
             doc_cbow = None
-        return doc_cbow
+        return doc_cbow'''
 
     def similarities(self, doc1, doc2, model='tfidf'):
         """
