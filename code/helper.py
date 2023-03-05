@@ -4,26 +4,6 @@ import openpyxl
 from collections import Counter
 
 
-
-'''def get_similarity_scores(text, documents, encoding_method,
-                          version,cols=['Descriptions'],path='../reports/corpus.xlsx'):
-    # Initialize TextModels object
-    tm = TextModels(excel_path=path, columns=cols)
-    encode_func = tm.encode
-    
-    # Calculate similarity scores
-    similarity_scores = {}
-    query_encoding = encode_func(text, encoding_method, version)
-    for doc in documents:
-        doc_encoding = encode_func(doc, encoding_method, version)
-        similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
-        similarity_scores[doc] = similarity_score
-    
-    # Sort similarity scores in descending order
-    similarity_scores = {k: v for k, v in sorted(similarity_scores.items(), key=lambda item: item[1], reverse=True)}
-    
-    return similarity_scores'''
-
 def get_similarity_scores(text, documents, encoding_method,
                           version, tm):
     encode_func = tm.encode
@@ -202,6 +182,7 @@ def common_items(input_list, input_dict):
         result[key] = list(common)
 
     return result
+
 
 def candidate_templates(descriptions, targets, model, version, tm, path, n=10):
     print(f'==================== {model} ====================')
