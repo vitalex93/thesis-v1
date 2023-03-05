@@ -5,10 +5,27 @@ from collections import Counter
 
 
 
-def get_similarity_scores(text, documents, encoding_method,
+'''def get_similarity_scores(text, documents, encoding_method,
                           version,cols=['Descriptions'],path='../reports/corpus.xlsx'):
     # Initialize TextModels object
     tm = TextModels(excel_path=path, columns=cols)
+    encode_func = tm.encode
+    
+    # Calculate similarity scores
+    similarity_scores = {}
+    query_encoding = encode_func(text, encoding_method, version)
+    for doc in documents:
+        doc_encoding = encode_func(doc, encoding_method, version)
+        similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
+        similarity_scores[doc] = similarity_score
+    
+    # Sort similarity scores in descending order
+    similarity_scores = {k: v for k, v in sorted(similarity_scores.items(), key=lambda item: item[1], reverse=True)}
+    
+    return similarity_scores'''
+
+def get_similarity_scores(text, documents, encoding_method,
+                          version, tm):
     encode_func = tm.encode
     
     # Calculate similarity scores
@@ -63,10 +80,10 @@ def get_first_n_keys(dictionary, n):
     return keys_list
 
 
-def get_similarities_for_values(values, docs, encoding_method, version, n):
+def get_similarities_for_values(values, docs, encoding_method, version, tm, n):
     similarities_dict = {}
     for value in values:
-        similarities_dict[value] = get_first_n_keys(get_similarity_scores(value, docs, encoding_method, version), n)
+        similarities_dict[value] = get_first_n_keys(get_similarity_scores(value, docs, encoding_method, version, tm), n)
     return similarities_dict
 
 
@@ -136,9 +153,9 @@ def df_to_lists(df):
     return result
 
 
-def results_to_targets(descriptions, targets, model, version, n, path='../reports/corpus.xlsx', i=0):
+def results_to_targets(descriptions, targets, model, version, tm, n, path='../reports/corpus.xlsx', i=0):
     
-    results_dict = get_similarities_for_values(descriptions,targets,model,version,n)
+    results_dict = get_similarities_for_values(descriptions,targets,model,version,tm,n)
     results_df = pd.DataFrame.from_dict(results_dict)
 
     results = df_to_lists(results_df)
@@ -158,6 +175,7 @@ def results_to_targets(descriptions, targets, model, version, n, path='../report
 
 
 def common_items(input_list, input_dict):
+
     """
     Returns a dictionary with the common items between the input list and each value list in the input dictionary.
 
@@ -184,6 +202,13 @@ def common_items(input_list, input_dict):
         result[key] = list(common)
 
     return result
+
+def candidate_templates(descriptions, targets, model, version, tm, path, n=10):
+    print(f'==================== {model} ====================')
+    for i in range(9):
+        d = results_to_targets(descriptions, targets, model, version, tm, n, path,i)
+        print(f'Candidate templates for Q{i+1}')
+        print(d)
 
 
 
