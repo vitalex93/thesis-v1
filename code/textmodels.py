@@ -7,6 +7,12 @@ import spacy
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import joblib
+import re
+import string
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
 
 
 class TextModels:
@@ -28,24 +34,44 @@ class TextModels:
         self.w2v_workers = w2v_workers
         self.cbow_window = cbow_window
 
-    def build_bow_model(self):
-        # Build a bag-of-words (BOW) model from the input columns
-        self.bow_model = CountVectorizer()
-        texts = []
-        for col in self.columns:
-            texts += self.df[col].tolist()
-        self.bow_model.fit_transform(texts)
-        self.bow_vectorizer = self.bow_model
-        #OK
+    def build_bow_model(self, preprocessing=False):
+        if preprocessing == False:
+            # Build a bag-of-words (BOW) model from the input columns
+            self.bow_model = CountVectorizer()
+            texts = []
+            for col in self.columns:
+                texts += self.df[col].tolist()
+            self.bow_model.fit_transform(texts)
+            self.bow_vectorizer = self.bow_model
+        elif preprocessing == True:
+            # Build a bag-of-words (BOW) model from the input columns
+            self.bow_model = CountVectorizer()
+            texts = []
+            for col in self.columns:
+                texts += self.df[col].tolist()
+            texts = [self.preprocess_text(element) for element in texts]
+            self.bow_model.fit_transform(texts)
+            self.bow_vectorizer = self.bow_model
+            #OK
 
-    def build_tfidf_model(self):
-        # Build a TF-IDF model from the input columns
-        self.tfidf_model = TfidfVectorizer()
-        texts = []
-        for col in self.columns:
-            texts += self.df[col].tolist()
-        self.tfidf_model.fit_transform(texts)
-        self.tfidf_vectorizer = self.tfidf_model
+    def build_tfidf_model(self, preprocessing=False):
+        if preprocessing == False:
+            # Build a TF-IDF model from the input columns
+            self.tfidf_model = TfidfVectorizer()
+            texts = []
+            for col in self.columns:
+                texts += self.df[col].tolist()
+            self.tfidf_model.fit_transform(texts)
+            self.tfidf_vectorizer = self.tfidf_model
+        elif preprocessing == True:
+            # Build a TF-IDF model from the input columns
+            self.tfidf_model = TfidfVectorizer()
+            texts = []
+            for col in self.columns:
+                texts += self.df[col].tolist()
+            self.tfidf_model.fit_transform(texts)
+            texts = [self.preprocess_text(element) for element in texts]
+            self.tfidf_vectorizer = self.tfidf_model
         #OK
     
     def save_models(self, file_prefix=""):
@@ -87,11 +113,39 @@ class TextModels:
         #OK
 
     def encode_tfidf(self, text, version='tfidf_model.joblib'):
+
         tm = joblib.load(version)
         self.tfidf_vectorizer = tm
         doc_tfidf = self.tfidf_vectorizer.transform([text])
         return doc_tfidf.toarray()[0]
         #OK
+
+    def preprocess_text(self,text):
+        # Convert to lowercase
+        text = text.lower()
+        
+        # Remove numbers
+        text = re.sub(r'\d+', '', text)
+        
+        # Remove punctuation
+        text = text.translate(str.maketrans('', '', string.punctuation))
+        
+        # Tokenize
+        words = word_tokenize(text)
+        
+        # Remove stopwords
+        stop_words = set(stopwords.words('english'))
+        words = [word for word in words if word not in stop_words]
+        
+        # Lemmatize
+        lemmatizer = WordNetLemmatizer()
+        words = [lemmatizer.lemmatize(word) for word in words]
+        
+        # Join words back into a string
+        text = ' '.join(words)
+        
+        return text
+
 
     def encode_word2vec(self, sentence):
         # Encode a document using the TF-IDF model
