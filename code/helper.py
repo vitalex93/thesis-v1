@@ -5,12 +5,12 @@ from collections import Counter
 
 
 def get_similarity_scores(text, documents, encoding_method,
-                          version, tm):
+                          version, tm, preprocessing=False):
     encode_func = tm.encode
     
     # Calculate similarity scores
     similarity_scores = {}
-    query_encoding = encode_func(text, encoding_method, version)
+    query_encoding = encode_func(text=text, model=encoding_method, version=version, preprocessing=preprocessing)
     for doc in documents:
         doc_encoding = encode_func(doc, encoding_method, version)
         similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
@@ -60,10 +60,12 @@ def get_first_n_keys(dictionary, n):
     return keys_list
 
 
-def get_similarities_for_values(values, docs, encoding_method, version, tm, n):
+def get_similarities_for_values(values, docs, encoding_method, version, tm, preprocessing=False, n=10):
     similarities_dict = {}
     for value in values:
-        similarities_dict[value] = get_first_n_keys(get_similarity_scores(value, docs, encoding_method, version, tm), n)
+        similarities_dict[value] = get_first_n_keys(get_similarity_scores(text=value, documents=docs, 
+                                                                          encoding_method=encoding_method, 
+                                                                          version=version, tm=tm, preprocessing=preprocessing), n)
     return similarities_dict
 
 
@@ -133,24 +135,33 @@ def df_to_lists(df):
     return result
 
 
-def results_to_targets(descriptions, targets, model, version, tm, n, path='../reports/corpus.xlsx', i=0):
+def results_to_targets(descriptions, targets, model, version, tm, preprocessing=False, n=10, path='../reports/corpus.xlsx', i=0):
     
-    results_dict = get_similarities_for_values(descriptions,targets,model,version,tm,n)
+    results_dict = get_similarities_for_values(values=descriptions,docs=targets,encoding_method=model,
+                                               version=version,tm=tm,preprocessing=preprocessing,n=n)
     results_df = pd.DataFrame.from_dict(results_dict)
-
     results = df_to_lists(results_df)
-    ground_truth = {'R1':get_column_values(path, 'R1', 'C'),
-                    'R2':get_column_values(path, 'R2', 'C'),
-                    'R3':get_column_values(path, 'R3', 'C'),
-                    'R4':get_column_values(path, 'R4', 'C'),
-                    'R5':get_column_values(path, 'R5', 'C'),
-                    'R6':get_column_values(path, 'R6', 'C'),
-                    'R7':get_column_values(path, 'R7', 'C'),
-                    'R8':get_column_values(path, 'R8', 'C'),
-                    'R9':get_column_values(path, 'R9', 'C')}
-
+    if preprocessing == False:
+        ground_truth = {'R1':get_column_values(path, 'R1', 'C'),
+                        'R2':get_column_values(path, 'R2', 'C'),
+                        'R3':get_column_values(path, 'R3', 'C'),
+                        'R4':get_column_values(path, 'R4', 'C'),
+                        'R5':get_column_values(path, 'R5', 'C'),
+                        'R6':get_column_values(path, 'R6', 'C'),
+                        'R7':get_column_values(path, 'R7', 'C'),
+                        'R8':get_column_values(path, 'R8', 'C'),
+                        'R9':get_column_values(path, 'R9', 'C')}
+    elif preprocessing == True:
+        ground_truth = {'R1':[preprocess_text(element) for element in get_column_values(path, 'R1', 'C')],
+                        'R2':[preprocess_text(element) for element in get_column_values(path, 'R2', 'C')],
+                        'R3':[preprocess_text(element) for element in get_column_values(path, 'R3', 'C')],
+                        'R4':[preprocess_text(element) for element in get_column_values(path, 'R4', 'C')],
+                        'R5':[preprocess_text(element) for element in get_column_values(path, 'R5', 'C')],
+                        'R6':[preprocess_text(element) for element in get_column_values(path, 'R6', 'C')],
+                        'R7':[preprocess_text(element) for element in get_column_values(path, 'R7', 'C')],
+                        'R8':[preprocess_text(element) for element in get_column_values(path, 'R8', 'C')],
+                        'R9':[preprocess_text(element) for element in get_column_values(path, 'R9', 'C')]}        
     matched = common_items(results[i], ground_truth)
-
     return matched
 
 
@@ -184,10 +195,38 @@ def common_items(input_list, input_dict):
     return result
 
 
-def candidate_templates(descriptions, targets, model, version, tm, path, n=10):
+def preprocess_text(text):
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Remove numbers
+    text = re.sub(r'\d+', '', text)
+    
+    # Remove punctuation
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    
+    # Tokenize
+    words = word_tokenize(text)
+    
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    words = [word for word in words if word not in stop_words]
+    
+    # Lemmatize
+    lemmatizer = WordNetLemmatizer()
+    words = [lemmatizer.lemmatize(word) for word in words]
+    
+    # Join words back into a string
+    text = ' '.join(words)
+    
+    return text
+
+
+def candidate_templates(descriptions, targets, model, version, tm, path, preprocessing=False, n=10):
     print(f'==================== {model} ====================')
     for i in range(9):
-        d = results_to_targets(descriptions, targets, model, version, tm, n, path,i)
+        d = results_to_targets(descriptions=descriptions, targets=targets, model=model, 
+                               version=version, tm=tm, preprocessing=preprocessing, n=n, path=path, i=i)
         print(f'Candidate templates for Q{i+1}')
         print(d)
 

@@ -91,34 +91,61 @@ class TextModels:
         else:
             print("No TF-IDF model to save.")
 
-    def encode(self, text, model, version=None):
-        if model == 'bow':
-            sentence_embedding = self.encode_bow(text=text, version=version)
-            return sentence_embedding
-        elif model == 'tfidf':
-            sentence_embedding = self.encode_tfidf(text=text, version=version)
-            return sentence_embedding
-        elif model == 'word2vec':
-            sentence_embedding = self.encode_word2vec(sentence=text)
-            return sentence_embedding
-        elif model == 'sbert':
-            sentence_embedding = self.encode_sentence_bert(sentence=text)
-            return sentence_embedding 
+    def encode(self, text, model, version=None, preprocessing=False):
+        if preprocessing == False:
+            if model == 'bow':
+                sentence_embedding = self.encode_bow(text=text, version=version, preprocessing=False)
+                return sentence_embedding
+            elif model == 'tfidf':
+                sentence_embedding = self.encode_tfidf(text=text, version=version, preprocessing=False)
+                return sentence_embedding
+            elif model == 'word2vec':
+                sentence_embedding = self.encode_word2vec(sentence=text, preprocessing=False)
+                return sentence_embedding
+            elif model == 'sbert':
+                sentence_embedding = self.encode_sentence_bert(sentence=text,preprocessing=False)
+                return sentence_embedding 
+        elif preprocessing == True:
+            if model == 'bow':
+                sentence_embedding = self.encode_bow(text=text, version=version, preprocessing=True)
+                return sentence_embedding
+            elif model == 'tfidf':
+                sentence_embedding = self.encode_tfidf(text=text, version=version, preprocessing=True)
+                return sentence_embedding
+            elif model == 'word2vec':
+                sentence_embedding = self.encode_word2vec(sentence=text, preprocessing=True)
+                return sentence_embedding
+            elif model == 'sbert':
+                sentence_embedding = self.encode_sentence_bert(sentence=text, preprocessing=True)
+                return sentence_embedding 
 
-    def encode_bow(self, text, version='bow_model.joblib'):
-        tm = joblib.load(version)
-        self.bow_vectorizer = tm
-        doc_bow = self.bow_vectorizer.transform([text])
-        return doc_bow.toarray()[0]
-        #OK
+    def encode_bow(self, text, version='bow_model.joblib', preprocessing=False):
+        if preprocessing == False:
+            tm = joblib.load(version)
+            self.bow_vectorizer = tm
+            doc_bow = self.bow_vectorizer.transform([text])
+            return doc_bow.toarray()[0]
+        elif preprocessing == True:
+            tm = joblib.load(version)
+            text = self.preprocess_text(text)
+            self.bow_vectorizer = tm
+            doc_bow = self.bow_vectorizer.transform([text])
+            return doc_bow.toarray()[0]            
 
-    def encode_tfidf(self, text, version='tfidf_model.joblib'):
 
-        tm = joblib.load(version)
-        self.tfidf_vectorizer = tm
-        doc_tfidf = self.tfidf_vectorizer.transform([text])
-        return doc_tfidf.toarray()[0]
-        #OK
+    def encode_tfidf(self, text, version='tfidf_model.joblib', preprocessing=False):
+        if preprocessing == False:
+            tm = joblib.load(version)
+            self.tfidf_vectorizer = tm
+            doc_tfidf = self.tfidf_vectorizer.transform([text])
+            return doc_tfidf.toarray()[0]
+        elif preprocessing == True:
+            tm = joblib.load(version)
+            text = self.preprocess_text(text)
+            self.tfidf_vectorizer = tm
+            doc_tfidf = self.tfidf_vectorizer.transform([text])
+            return doc_tfidf.toarray()[0]
+
 
     def preprocess_text(self,text):
         # Convert to lowercase
@@ -147,19 +174,28 @@ class TextModels:
         return text
 
 
-    def encode_word2vec(self, sentence):
-        # Encode a document using the TF-IDF model
-        words = sentence.split()
-        embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
-        sentence_embedding = sum(embeddings) / len(embeddings)
-        return sentence_embedding
-        #OK
+    def encode_word2vec(self, sentence, preprocessing=False):
+        if preprocessing == False:
+            words = sentence.split()
+            embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
+            sentence_embedding = sum(embeddings) / len(embeddings)
+            return sentence_embedding
+        elif preprocessing == True:
+            words = self.preprocess_text(sentence)
+            embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
+            sentence_embedding = sum(embeddings) / len(embeddings)
+            return sentence_embedding
 
-    def encode_sentence_bert(self, sentence):
-        # Encode a document using pretrained sentence Bert model
-        sentence_embedding = self.sbert_model.encode(sentence, convert_to_numpy =True)
-        return sentence_embedding
-        #OK
+   
+    def encode_sentence_bert(self, sentence, preprocessing=False):
+        if preprocessing == False:
+            # Encode a document using pretrained sentence Bert model
+            sentence_embedding = self.sbert_model.encode(sentence, convert_to_numpy =True)
+            return sentence_embedding
+        elif preprocessing == True:
+            sentence_embedding = self.sbert_model.encode(self.preprocess_text(sentence), convert_to_numpy =True)
+            return sentence_embedding
+
 
     def similarities(self, doc1, doc2, model='tfidf'):
         """

@@ -31,7 +31,7 @@ def preprocess_text(text):
     words = [lemmatizer.lemmatize(word) for word in words]
     
     # Join words back into a string
-    #text = ' '.join(words)
+    text = ' '.join(words)
     
     return words
 
