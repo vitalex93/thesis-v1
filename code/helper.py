@@ -162,7 +162,7 @@ def results_to_targets(descriptions, targets, model, version, tm, preprocessing=
                         'R8':[preprocess_text(element) for element in get_column_values(path, 'R8', 'C')],
                         'R9':[preprocess_text(element) for element in get_column_values(path, 'R9', 'C')]}        
     matched = common_items(results[i], ground_truth)
-    return matched
+    return results_df #matched
 
 
 def common_items(input_list, input_dict):
