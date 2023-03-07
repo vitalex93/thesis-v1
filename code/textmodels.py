@@ -182,12 +182,14 @@ class TextModels:
         if preprocessing == False:
             words = sentence.split()
             embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
-            sentence_embedding = sum(embeddings) / len(embeddings)
+            sentence_embedding = sum(embeddings) / self.word2vec_model.vector_size
             return sentence_embedding
         elif preprocessing == True:
             words = self.preprocess_text(sentence)
+            #check this
+            words = words.split()
             embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
-            sentence_embedding = sum(embeddings) / len(embeddings)
+            sentence_embedding = sum(embeddings) / self.word2vec_model.vector_size
             return sentence_embedding
 
    
