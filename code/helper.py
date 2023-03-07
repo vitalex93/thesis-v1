@@ -61,9 +61,10 @@ def get_first_n_keys(dictionary, n):
 
 
 def get_similarities_for_values(values, docs, encoding_method, version, tm, preprocessing=False, n=10):
+    reports = ['R1','R2','R3','R4','R5','R6','R7','R8','R9']
     similarities_dict = {}
-    for value in values:
-        similarities_dict[value] = get_first_n_keys(get_similarity_scores(text=value, documents=docs, 
+    for i in range(len(reports)):
+        similarities_dict[reports[i]] = get_first_n_keys(get_similarity_scores(text=values[i], documents=docs, 
                                                                           encoding_method=encoding_method, 
                                                                           version=version, tm=tm, preprocessing=preprocessing), n)
     return similarities_dict
@@ -162,7 +163,7 @@ def results_to_targets(descriptions, targets, model, version, tm, preprocessing=
                         'R8':[preprocess_text(element) for element in get_column_values(path, 'R8', 'C')],
                         'R9':[preprocess_text(element) for element in get_column_values(path, 'R9', 'C')]}        
     matched = common_items(results[i], ground_truth)
-    return results_df #matched
+    return matched
 
 
 def common_items(input_list, input_dict):
