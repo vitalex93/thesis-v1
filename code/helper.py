@@ -14,10 +14,11 @@ def get_similarity_scores(text, documents, encoding_method,
     #print(query_encoding)
     for doc in documents:
         doc_encoding = encode_func(doc, encoding_method, version)
-        #doc_encoding = doc_encoding.reshape(1, -1)
-        #print (doc_encoding)
-        similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
-        similarity_scores[doc] = similarity_score
+        if doc_encoding is not None:
+            similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
+            similarity_scores[doc] = similarity_score
+        else:
+            similarity_scores[doc] = 0
     
     # Sort similarity scores in descending order
     similarity_scores = {k: v for k, v in sorted(similarity_scores.items(), key=lambda item: item[1], reverse=True)}
