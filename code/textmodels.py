@@ -178,7 +178,7 @@ class TextModels:
         return text
 
 
-    def encode_word2vec(self, sentence, preprocessing=False):
+    '''def encode_word2vec(self, sentence, preprocessing=False):
         if preprocessing == False:
             words = sentence.split()
             embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
@@ -190,7 +190,21 @@ class TextModels:
             words = words.split()
             embeddings = [self.word2vec_model[word] for word in words if word in self.word2vec_model]
             sentence_embedding = sum(embeddings) / self.word2vec_model.vector_size
-            return sentence_embedding
+            return sentence_embedding'''
+    
+    def encode_word2vec(self, sentence, preprocessing=False):
+        if preprocessing == False:
+            words = sentence.split()
+            embeddings = []
+            for word in words:
+                if word in self.word2vec_model:
+                    embeddings.append(self.word2vec_model[word])
+            if len(embeddings) > 0:
+                sentence_embedding = sum(embeddings) / len(embeddings)
+                return sentence_embedding
+            else:
+                return None
+
 
    
     def encode_sentence_bert(self, sentence, preprocessing=False):

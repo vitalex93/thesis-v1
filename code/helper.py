@@ -11,8 +11,11 @@ def get_similarity_scores(text, documents, encoding_method,
     # Calculate similarity scores
     similarity_scores = {}
     query_encoding = encode_func(text=text, model=encoding_method, version=version, preprocessing=preprocessing)
+    #print(query_encoding)
     for doc in documents:
         doc_encoding = encode_func(doc, encoding_method, version)
+        #doc_encoding = doc_encoding.reshape(1, -1)
+        #print (doc_encoding)
         similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
         similarity_scores[doc] = similarity_score
     
@@ -241,6 +244,7 @@ def get_unique_items(list1, list2):
 
     # Return the unique items
     return unique_list1, unique_list2
+
 
 
 
