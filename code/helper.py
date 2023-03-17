@@ -2,6 +2,7 @@ from textmodels import *
 import pandas as pd
 import openpyxl
 from collections import Counter
+import gensim
 
 
 def get_similarity_scores(text, documents, encoding_method,
@@ -245,6 +246,37 @@ def get_unique_items(list1, list2):
 
     # Return the unique items
     return unique_list1, unique_list2
+
+
+def percentage_of_words_in_word2vec_vocabulary(word2vec_model, sentence_list):
+    # Load the pretrained Word2Vec model
+    model = api.load(word2vec_model)
+
+    # Create an empty dictionary to store the percentages
+    percentage_dict = {}
+
+    # Iterate through each sentence in the list
+    for sentence in sentence_list:
+        # Split the sentence into a list of words
+        words_list = sentence.split()
+
+        # Count the number of words in the sentence
+        total_words = len(words_list)
+
+        # Count the number of words that exist in the model's vocabulary
+        words_found = 0
+        for word in words_list:
+            if word in model:
+                words_found += 1
+
+        # Calculate the percentage of words found
+        percentage_found = (words_found / total_words) * 100
+
+        # Add the sentence and percentage to the dictionary
+        percentage_dict[sentence] = f'{percentage_found:.2f}%'
+
+    return percentage_dict
+
 
 
 
