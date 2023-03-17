@@ -66,7 +66,7 @@ def get_first_n_keys(dictionary, n):
 
 
 def get_similarities_for_values(values, docs, encoding_method, version, tm, preprocessing=False, n=10):
-    reports = ['R1','R2','R3','R4','R5','R6','R7','R8','R9']
+    reports = ['Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9']
     similarities_dict = {}
     for i in range(len(reports)):
         similarities_dict[reports[i]] = get_first_n_keys(get_similarity_scores(text=values[i], documents=docs, 
@@ -276,6 +276,28 @@ def percentage_of_words_in_word2vec_vocabulary(word2vec_model, sentence_list):
         percentage_dict[sentence] = f'{percentage_found:.2f}%'
 
     return percentage_dict
+
+
+def evaluation_metrics(results, metric, encoding_method,
+                        version_bow=None,version_tfidf=None, version_w2v=None, version_sbert=None, k=10):
+    if encoding_method == 'bow':
+        model = joblib.load(version_bow)
+    elif encoding_method == 'tfidf':
+        model = joblib.load(version_tfidf)
+    elif encoding_method == 'word2vec':
+        model = api.load(version_w2v)
+    elif encoding_method == 'sbert':
+        model =  SentenceTransformer(version_sbert)
+
+    if metric == 'precision':
+        result = {}
+        for key, value in results.items():
+            n = len(value)
+            percentage = (n / k) * 100
+            result[key] = percentage
+        return result
+    elif metric == 'recall':
+        pass
 
 
 
