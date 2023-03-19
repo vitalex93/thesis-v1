@@ -319,7 +319,7 @@ def calculate_percentage(dict1, dict2, key1, key2):
     return percentage
 
 
-def precision(values, docs, encoding_method,
+'''def precision(values, docs, encoding_method,
             version, tm, preprocessing, path, n):
     ground_truth = {'R1':get_column_values(path, 'R1', 'C'),
                 'R2':get_column_values(path, 'R2', 'C'),
@@ -337,7 +337,19 @@ def precision(values, docs, encoding_method,
         query = 'Q' + str(i+1)
         report = 'R' + str(i+1)
         precision[query] = calculate_percentage(results, ground_truth,query,report)
+    return precision'''
+
+
+def precision(values, docs, encoding_method, version, tm, preprocessing, path, n):
+    ground_truth = {'R'+str(i+1):get_column_values(path, 'R'+str(i+1), 'C') for i in range(9)}
+    precision = {}
+    for i in range(9):
+        query = 'Q' + str(i+1)
+        report = 'R' + str(i+1)
+        precision[query] = calculate_percentage(get_similarities_for_values(values=values, docs=docs, encoding_method=encoding_method,
+                                      version=version, tm=tm, preprocessing=preprocessing, n=n), ground_truth,query,report)
     return precision
+
 
 
 
