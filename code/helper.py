@@ -299,8 +299,45 @@ def evaluation_metrics(results, metric, encoding_method,
     elif metric == 'recall':
         pass
 
+def calculate_percentage(dict1, dict2, key1, key2):
+    if key1 not in dict1 or key2 not in dict2:
+        return "Invalid keys provided"
+    
+    list1 = dict1[key1]
+    list2 = dict2[key2]
+    
+    if not list1 or not list2:
+        return "One or both of the lists is empty"
+    
+    count = 0
+    for element in list1:
+        if element in list2:
+            count += 1
+    
+    percentage = (count / len(list1)) * 100
+    
+    return percentage
 
 
+def precision(values, docs, encoding_method,
+            version, tm, preprocessing, path, n):
+    ground_truth = {'R1':get_column_values(path, 'R1', 'C'),
+                'R2':get_column_values(path, 'R2', 'C'),
+                'R3':get_column_values(path, 'R3', 'C'),
+                'R4':get_column_values(path, 'R4', 'C'),
+                'R5':get_column_values(path, 'R5', 'C'),
+                'R6':get_column_values(path, 'R6', 'C'),
+                'R7':get_column_values(path, 'R7', 'C'),
+                'R8':get_column_values(path, 'R8', 'C'),
+                'R9':get_column_values(path, 'R9', 'C')}
+    results = get_similarities_for_values(values=values, docs=docs, encoding_method=encoding_method,
+                                      version=version, tm=tm, preprocessing=preprocessing, n=n)
+    precision = {}
+    for i in range(9):
+        query = 'Q' + str(i+1)
+        report = 'R' + str(i+1)
+        precision[query] = calculate_percentage(results, ground_truth,query,report)
+    return precision
 
 
 
