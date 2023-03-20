@@ -38,10 +38,10 @@ class TextModels:
         self.w2v_workers = w2v_workers
         self.cbow_window = cbow_window
 
-    def build_bow_model(self, preprocessing=False):
+    def build_bow_model(self, preprocessing=False, ngram_range=(1,1)):
         if preprocessing == False:
             # Build a bag-of-words (BOW) model from the input columns
-            self.bow_model = CountVectorizer()
+            self.bow_model = CountVectorizer(ngram_range=ngram_range)
             texts = []
             for col in self.columns:
                 texts += self.df[col].tolist()
@@ -49,7 +49,7 @@ class TextModels:
             self.bow_vectorizer = self.bow_model
         elif preprocessing == True:
             # Build a bag-of-words (BOW) model from the input columns
-            self.bow_model = CountVectorizer()
+            self.bow_model = CountVectorizer(ngram_range=ngram_range)
             texts = []
             for col in self.columns:
                 texts += self.df[col].tolist()
@@ -58,10 +58,10 @@ class TextModels:
             self.bow_vectorizer = self.bow_model
             #OK
 
-    def build_tfidf_model(self, preprocessing=False):
+    def build_tfidf_model(self, preprocessing=False,  ngram_range=(1,1)):
         if preprocessing == False:
             # Build a TF-IDF model from the input columns
-            self.tfidf_model = TfidfVectorizer()
+            self.tfidf_model = TfidfVectorizer(ngram_range=ngram_range)
             texts = []
             for col in self.columns:
                 texts += self.df[col].tolist()
@@ -69,7 +69,7 @@ class TextModels:
             self.tfidf_vectorizer = self.tfidf_model
         elif preprocessing == True:
             # Build a TF-IDF model from the input columns
-            self.tfidf_model = TfidfVectorizer()
+            self.tfidf_model = TfidfVectorizer(ngram_range=ngram_range)
             texts = []
             for col in self.columns:
                 texts += self.df[col].tolist()
