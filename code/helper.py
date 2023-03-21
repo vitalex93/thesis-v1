@@ -6,15 +6,15 @@ import gensim
 
 
 def get_similarity_scores(text, documents, encoding_method,
-                          version, tm, preprocessing=False):
+                          version, tm, preprocessing=False, fin=False):
     encode_func = tm.encode
     
     # Calculate similarity scores
     similarity_scores = {}
-    query_encoding = encode_func(text=text, model=encoding_method, version=version, preprocessing=preprocessing)
+    query_encoding = encode_func(text=text, model=encoding_method, version=version, preprocessing=preprocessing, fin=fin)
     #print(query_encoding)
     for doc in documents:
-        doc_encoding = encode_func(doc, encoding_method, version)
+        doc_encoding = encode_func(text=doc, model=encoding_method, version=version, preprocessing=preprocessing, fin=fin)
         if doc_encoding is not None:
             similarity_score = cosine_similarity([query_encoding], [doc_encoding])[0][0]
             similarity_scores[doc] = similarity_score
@@ -65,13 +65,13 @@ def get_first_n_keys(dictionary, n):
     return keys_list
 
 
-def get_similarities_for_values(values, docs, encoding_method, version, tm, preprocessing=False, n=10):
+def get_similarities_for_values(values, docs, encoding_method, version, tm, preprocessing=False, n=10, fin=False):
     reports = ['Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9']
     similarities_dict = {}
     for i in range(len(reports)):
         similarities_dict[reports[i]] = get_first_n_keys(get_similarity_scores(text=values[i], documents=docs, 
                                                                           encoding_method=encoding_method, 
-                                                                          version=version, tm=tm, preprocessing=preprocessing), n)
+                                                                          version=version, tm=tm, preprocessing=preprocessing, fin=fin), n)
     return similarities_dict
 
 
@@ -141,10 +141,10 @@ def df_to_lists(df):
     return result
 
 
-def results_to_targets(descriptions, targets, model, version, tm, preprocessing=False, n=10, path='../reports/corpus.xlsx', i=0):
+def results_to_targets(descriptions, targets, model, version, tm, preprocessing=False, n=10, path='../reports/corpus.xlsx', i=0, fin=False):
     
     results_dict = get_similarities_for_values(values=descriptions,docs=targets,encoding_method=model,
-                                               version=version,tm=tm,preprocessing=preprocessing,n=n)
+                                               version=version,tm=tm,preprocessing=preprocessing,n=n, fin=fin)
     results_df = pd.DataFrame.from_dict(results_dict)
     results = df_to_lists(results_df)
     if preprocessing == False:
@@ -228,11 +228,11 @@ def preprocess_text(text):
     return text
 
 
-def candidate_templates(descriptions, targets, model, version, tm, path, preprocessing=False, n=10):
+def candidate_templates(descriptions, targets, model, version, tm, path, preprocessing=False, n=10, fin=False):
     print(f'==================== {model} ====================')
     for i in range(9):
         d = results_to_targets(descriptions=descriptions, targets=targets, model=model, 
-                               version=version, tm=tm, preprocessing=preprocessing, n=n, path=path, i=i)
+                               version=version, tm=tm, preprocessing=preprocessing, n=n, path=path, i=i, fin=fin)
         print(f'Candidate templates for Q{i+1}')
         print(d)
 
@@ -342,16 +342,50 @@ def calculate_percentage(dict1, dict2, key1, key2, metric):
     return precision'''
 
 
-def evaluation_metrics(metric, values, docs, encoding_method, version, tm, preprocessing, path, n):
+def evaluation_metrics(metric, values, docs, encoding_method, version, tm, preprocessing, path, n, fin=False):
     ground_truth = {'R'+str(i+1):get_column_values(path, 'R'+str(i+1), 'C') for i in range(9)}
     metrics = {}
     for i in range(9):
         query = 'Q' + str(i+1)
         report = 'R' + str(i+1)
         metrics[query] = calculate_percentage(get_similarities_for_values(values=values, docs=docs, encoding_method=encoding_method,
-                                      version=version, tm=tm, preprocessing=preprocessing, n=n), ground_truth,query,report, metric)
+                                      version=version, tm=tm, preprocessing=preprocessing, n=n, fin=fin), ground_truth,query,report, metric)
     return metrics
 
+
+'''def dict_to_dataframe(input_dict):
+    # create an empty DataFrame with the same columns as the internal dictionaries
+    columns = list(input_dict[next(iter(input_dict))].keys())
+    df = pd.DataFrame(columns=columns)
+
+    # loop through the external dictionary and add each row to the DataFrame
+    for key, values_dict in input_dict.items():
+        row = [values_dict[column] for column in columns]
+        df.loc[key] = row
+
+    return df
+    input_dict = {
+    "dict1": {"a": 1, "b": 2, "c": 3},
+    "dict2": {"a": 4, "b": 5, "c": 6},
+    "dict3": {"a": 7, "b": 8, "c": 9}
+}
+
+df = dict_to_dataframe(input_dict)
+print(df)
+'''
+
+
+def dict_to_dataframe(input_dict):
+    # Create an empty DataFrame with the column names as the keys of the input_dict
+    df = pd.DataFrame(columns=input_dict.keys())
+    
+    # Loop through each key-value pair in the input_dict
+    for outer_key in input_dict.keys():
+        # Add a new row to the DataFrame for each key-value pair in the inner_dict
+        for inner_key, inner_value in input_dict[outer_key].items():
+            df.loc[inner_key, outer_key] = inner_value
+    
+    return df
 
 
 

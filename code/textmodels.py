@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from gensim.models import Word2Vec
+from gensim.models import Word2Vec, KeyedVectors
 import gensim.downloader as api
 import spacy
 from sentence_transformers import SentenceTransformer
@@ -14,6 +14,7 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
+
 '''nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('punkt')'''
@@ -21,7 +22,8 @@ nltk.download('punkt')'''
 
 class TextModels:
 
-    def __init__(self, excel_path, columns,word2vec_version="word2vec-google-news-300",w2v_window=5, w2v_workers=4,
+    def __init__(self, excel_path, columns,word2vec_version="word2vec-google-news-300", 
+                 word2vec_version_fin_path='C:/Users/avitsas/Documents/VECTORS/word.w2v.200.bin',w2v_window=5, w2v_workers=4,
                  sbert_model="bert-base-nli-mean-tokens", cbow_window=5):
         self.df = pd.read_excel(excel_path)
         self.columns = columns
@@ -33,6 +35,7 @@ class TextModels:
         self.bow_vectorizer = None
         self.tfidf_vectorizer = None
         self.word2vec_model = api.load(word2vec_version)
+        self.word2vec_model_fin = KeyedVectors.load_word2vec_format(word2vec_version_fin_path, binary=True)
         self.nlp = spacy.load('en_core_web_sm')
         self.w2v_window = w2v_window
         self.w2v_workers = w2v_workers
@@ -95,7 +98,7 @@ class TextModels:
         else:
             print("No TF-IDF model to save.")
 
-    def encode(self, text, model, version=None, preprocessing=False):
+    def encode(self, text, model, version=None, preprocessing=False, fin=False):
         if preprocessing == False:
             if model == 'bow':
                 sentence_embedding = self.encode_bow(text=text, version=version, preprocessing=False)
@@ -104,7 +107,7 @@ class TextModels:
                 sentence_embedding = self.encode_tfidf(text=text, version=version, preprocessing=False)
                 return sentence_embedding
             elif model == 'word2vec':
-                sentence_embedding = self.encode_word2vec(sentence=text, preprocessing=False)
+                sentence_embedding = self.encode_word2vec(sentence=text, preprocessing=False, fin=fin)
                 return sentence_embedding
             elif model == 'sbert':
                 sentence_embedding = self.encode_sentence_bert(sentence=text,preprocessing=False)
@@ -180,26 +183,40 @@ class TextModels:
 
 
     
-    def encode_word2vec(self, sentence, preprocessing=False):
-        if preprocessing == False:
-            words = sentence.split()
+    def encode_word2vec(self, sentence, preprocessing=False, fin=False):
+        if fin == False:
+            if preprocessing == False:
+                words = sentence.split()
+                embeddings = []
+                for word in words:
+                    if word in self.word2vec_model:
+                        embeddings.append(self.word2vec_model[word])
+                if len(embeddings) > 0:
+                    sentence_embedding = sum(embeddings) / len(embeddings)
+                    return sentence_embedding
+                else:
+                    return None
+                    
+            elif preprocessing == True:
+                #needs check
+                words = self.preprocess_text(sentence)
+                #words = sentence.split()
+                embeddings = []
+                for word in words:
+                    if word in self.word2vec_model:
+                        embeddings.append(self.word2vec_model[word])
+                if len(embeddings) > 0:
+                    sentence_embedding = sum(embeddings) / len(embeddings)
+                    return sentence_embedding
+                else:
+                    return None
+        elif fin == True:
+            sentence = self.preprocess_text(sentence)
             embeddings = []
-            for word in words:
-                if word in self.word2vec_model:
-                    embeddings.append(self.word2vec_model[word])
-            if len(embeddings) > 0:
-                sentence_embedding = sum(embeddings) / len(embeddings)
-                return sentence_embedding
-            else:
-                return None
-        elif preprocessing == True:
-            #needs check
-            words = self.preprocess_text(sentence)
-            words = sentence.split()
-            embeddings = []
-            for word in words:
-                if word in self.word2vec_model:
-                    embeddings.append(self.word2vec_model[word])
+            embedding_model = self.word2vec_model_fin
+            for word in sentence:
+                if word in embedding_model:
+                    embeddings.append(embedding_model.get_vector(word))
             if len(embeddings) > 0:
                 sentence_embedding = sum(embeddings) / len(embeddings)
                 return sentence_embedding
