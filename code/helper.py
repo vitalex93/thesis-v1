@@ -278,7 +278,7 @@ def percentage_of_words_in_word2vec_vocabulary(word2vec_model, sentence_list):
     return percentage_dict
 
 
-def evaluation_metrics(results, metric, encoding_method,
+'''def evaluation_metrics(results, metric, encoding_method,
                         version_bow=None,version_tfidf=None, version_w2v=None, version_sbert=None, k=10):
     if encoding_method == 'bow':
         model = joblib.load(version_bow)
@@ -297,7 +297,7 @@ def evaluation_metrics(results, metric, encoding_method,
             result[key] = percentage
         return result
     elif metric == 'recall':
-        pass
+        pass'''
 
 def calculate_percentage(dict1, dict2, key1, key2, metric):
     if key1 not in dict1 or key2 not in dict2:

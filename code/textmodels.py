@@ -181,10 +181,10 @@ class TextModels:
         return text
 
 
-
-    
     def encode_word2vec(self, sentence, preprocessing=False, fin=False):
         if fin == False:
+            #word2vec_model = api.load(version)
+            #self.word2vec_model = word2vec_model
             if preprocessing == False:
                 words = sentence.split()
                 embeddings = []
@@ -204,13 +204,15 @@ class TextModels:
                 embeddings = []
                 for word in words:
                     if word in self.word2vec_model:
-                        embeddings.append(self.word2vec_model[word])
+                        embeddings.append(word2vec_model[word])
                 if len(embeddings) > 0:
                     sentence_embedding = sum(embeddings) / len(embeddings)
                     return sentence_embedding
                 else:
                     return None
         elif fin == True:
+            #word2vec_model_fin = KeyedVectors.load_word2vec_format(version, binary=True)
+            #self.word2vec_model_fin = word2vec_model_fin
             sentence = self.preprocess_text(sentence)
             embeddings = []
             embedding_model = self.word2vec_model_fin
