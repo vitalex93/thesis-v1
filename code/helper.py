@@ -317,6 +317,12 @@ def calculate_percentage(dict1, dict2, key1, key2, metric):
         percentage = (count / len(list1)) * 100
     elif metric == 'recall':
         percentage = (count / len(list2)) * 100
+    elif metric == 'r_precision':
+        count = 0
+        for element in list1[:len(list2)]:
+            if element in list2:
+                count += 1
+        percentage = (count / len(list2)) * 100
     
     return percentage
 
