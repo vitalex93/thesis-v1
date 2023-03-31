@@ -24,3 +24,8 @@ class DocumentClassifier:
         most_common_category, _ = category_counts.most_common(1)[0]
         category_ranking = category_counts.most_common()
         return most_common_category, category_ranking
+    
+    def get_top_n_categories(self, doc_text, n=3):
+        doc_categories, ranking = self.classify(doc_text)
+        top_n_categories = [cat for cat, rank in ranking[:n]]
+        return {doc_text: top_n_categories}
