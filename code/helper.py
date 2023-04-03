@@ -1,4 +1,5 @@
 from textmodels import *
+from DocumentClassifier import *
 import pandas as pd
 import openpyxl
 from collections import Counter
@@ -393,6 +394,38 @@ def dict_to_dataframe(input_dict):
     
     return df
 
+def rule_based_candidates(patterns ,path, sheet, col, n, mode):
+    descriptions = get_column_values(path, sheet, col[0])
+    classifier = DocumentClassifier(patterns)
+    candidates_dict = {}
+    for description in descriptions:
+        if mode == 'columns':
+            candidates_dict_single = classifier.get_top_n_categories(doc_text=description, n=n)
+            candidates_dict.update(candidates_dict_single)
+            return candidates_dict
+        elif mode == 'rows':
+            n = 1
+            candidates_dict_single = classifier.get_top_n_categories(doc_text=description, n=n)
+            candidates_dict.update(candidates_dict_single)
+            return candidates_dict
+
+
+
+    '''elif mode == 'rows':
+        sheet = 'rows'
+        row_groups = ['RG1', 'RG2', 'RG3', 'RG4']
+        rg_dict = {}
+        for row_group in range(len(row_groups)):
+            rg_dict[row_groups[row_group]] = get_column_values(path, sheet, col[row_group])
+            candidates_dict = {}
+        for description in descriptions:
+            candidates_dict_single = classifier.get_top_n_categories(doc_text=description, n=n)
+            candidates_dict.update(candidates_dict_single)'''
+
+        
+
+            
+   
 
 
 

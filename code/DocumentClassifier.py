@@ -27,5 +27,7 @@ class DocumentClassifier:
     
     def get_top_n_categories(self, doc_text, n=3):
         doc_categories, ranking = self.classify(doc_text)
-        top_n_categories = [cat for cat, rank in ranking[:n]]
+        top_n_categories = [cat for cat, rank in ranking[:n] if rank > 0]
         return {doc_text: top_n_categories}
+    
+
