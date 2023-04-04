@@ -394,20 +394,25 @@ def dict_to_dataframe(input_dict):
     
     return df
 
-def rule_based_candidates(patterns ,path, sheet, col, n, mode):
-    descriptions = get_column_values(path, sheet, col[0])
+def rule_based_candidates(patterns, descriptions, n, mode, path, sheet, col=['A','B','C','D']):
     classifier = DocumentClassifier(patterns)
     candidates_dict = {}
-    for description in descriptions:
-        if mode == 'columns':
+    if mode == 'columns':
+        for description in descriptions:
+            #if mode == 'columns':
             candidates_dict_single = classifier.get_top_n_categories(doc_text=description, n=n)
             candidates_dict.update(candidates_dict_single)
-            return candidates_dict
-        elif mode == 'rows':
-            n = 1
+    elif mode == 'rows':
+        rg_list = [['RowGroup1'], ['RowGroup2'],['RowGroup3'], ['RowGroup4']]
+        n = 1
+        for description in descriptions:
             candidates_dict_single = classifier.get_top_n_categories(doc_text=description, n=n)
             candidates_dict.update(candidates_dict_single)
-            return candidates_dict
+        for i in range(len(rg_list)):
+            for description in descriptions:
+                if candidates_dict[description] == rg_list[i]:
+                    candidates_dict[description] = get_column_values(path, sheet, col[i])
+    return candidates_dict
 
 
 
