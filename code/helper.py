@@ -4,6 +4,7 @@ import pandas as pd
 import openpyxl
 from collections import Counter
 import gensim
+import csv
 
 
 def get_similarity_scores(text, documents, encoding_method,
@@ -412,7 +413,48 @@ def rule_based_candidates(patterns, descriptions, n, mode, path, sheet, col=['A'
             for description in descriptions:
                 if candidates_dict[description] == rg_list[i]:
                     candidates_dict[description] = get_column_values(path, sheet, col[i])
+        for key in candidates_dict.keys():
+            candidates_dict[key] = [[val] for val in candidates_dict[key]]
     return candidates_dict
+
+'''def create_csv(list1, list2, filename):
+    # create a new CSV file and write the headers
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(list1)
+        
+        # write each row of values from list2
+        for row in list2:
+            writer.writerow(row)'''
+
+'''def create_csv(list1, list2, filename):
+    # create a new CSV file and write the headers
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(list1)
+        
+        # write each row of values from list2, replacing missing values with blank strings
+        for row in list2:
+            new_row = [val if val else "" for val in row]  # replace missing values with blank strings
+            writer.writerow(new_row)'''
+
+def create_csv(list1, list2, filename):
+    # create a new CSV file and write the headers
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(list1)
+        
+        # write each row of values from list2, replacing missing values with blank strings
+        for row in list2:
+            new_row = [val if val else "" for val in row]  # replace missing values with blank strings
+            if len(new_row) < len(list1):  # if the row is shorter than the header, add blank values to the end
+                diff = len(list1) - len(new_row)
+                new_row.extend(["" for i in range(diff)])
+            writer.writerow(new_row)
+
+
+
+
 
 
 
