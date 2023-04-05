@@ -139,7 +139,6 @@ class TextModels:
             doc_bow = self.bow_vectorizer.transform([text])
             return doc_bow.toarray()[0]            
 
-
     def encode_tfidf(self, text, version='tfidf_model.joblib', preprocessing=False):
         if preprocessing == False:
             tm = joblib.load(version)
@@ -152,7 +151,6 @@ class TextModels:
             self.tfidf_vectorizer = tm
             doc_tfidf = self.tfidf_vectorizer.transform([text])
             return doc_tfidf.toarray()[0]
-
 
     def preprocess_text(self,text):
         # Convert to lowercase
@@ -179,7 +177,6 @@ class TextModels:
         text = ' '.join(words)
         
         return text
-
 
     def encode_word2vec(self, sentence, preprocessing=False, fin=False):
         if fin == False:
@@ -224,8 +221,6 @@ class TextModels:
                 return sentence_embedding
             else:
                 return None
-
-
    
     def encode_sentence_bert(self, sentence, preprocessing=False):
         if preprocessing == False:
@@ -235,7 +230,6 @@ class TextModels:
         elif preprocessing == True:
             sentence_embedding = self.sbert_model.encode(self.preprocess_text(sentence), convert_to_numpy =True)
             return sentence_embedding
-
 
     def similarities(self, doc1, doc2, model='tfidf'):
         """
