@@ -417,27 +417,6 @@ def rule_based_candidates(patterns, descriptions, n, mode, path, sheet, col=['A'
             candidates_dict[key] = [[val] for val in candidates_dict[key]]
     return candidates_dict
 
-'''def create_csv(list1, list2, filename):
-    # create a new CSV file and write the headers
-    with open(filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(list1)
-        
-        # write each row of values from list2
-        for row in list2:
-            writer.writerow(row)'''
-
-'''def create_csv(list1, list2, filename):
-    # create a new CSV file and write the headers
-    with open(filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(list1)
-        
-        # write each row of values from list2, replacing missing values with blank strings
-        for row in list2:
-            new_row = [val if val else "" for val in row]  # replace missing values with blank strings
-            writer.writerow(new_row)'''
-
 def create_csv(list1, list2, filename):
     # create a new CSV file and write the headers
     with open(filename, 'w', newline='') as csvfile:
@@ -452,22 +431,21 @@ def create_csv(list1, list2, filename):
                 new_row.extend(["" for i in range(diff)])
             writer.writerow(new_row)
 
+def rule_based_templates(patterns_measures, patterns_rows, descriptions, n, path, sheet):
+    measures = rule_based_candidates(patterns=patterns_measures, descriptions=descriptions,
+                                     n=n, mode='columns', path=path, sheet=sheet)
+    rows = rule_based_candidates(patterns=patterns_rows, descriptions=descriptions,
+                                 n=n, mode='rows', path=path, sheet=sheet)
+    for i in range(len(descriptions)):
+        measure_list = measures[descriptions[i]]
+        rows_list = rows[descriptions[i]]
+        filename = '../reports/R' + str(i+1) + '_template.csv'
+        create_csv(measure_list, rows_list, filename=filename)
 
 
 
 
 
-
-    '''elif mode == 'rows':
-        sheet = 'rows'
-        row_groups = ['RG1', 'RG2', 'RG3', 'RG4']
-        rg_dict = {}
-        for row_group in range(len(row_groups)):
-            rg_dict[row_groups[row_group]] = get_column_values(path, sheet, col[row_group])
-            candidates_dict = {}
-        for description in descriptions:
-            candidates_dict_single = classifier.get_top_n_categories(doc_text=description, n=n)
-            candidates_dict.update(candidates_dict_single)'''
 
         
 
