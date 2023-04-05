@@ -439,7 +439,7 @@ def rule_based_templates(patterns_measures, patterns_rows, descriptions, n, path
     for i in range(len(descriptions)):
         measure_list = measures[descriptions[i]]
         rows_list = rows[descriptions[i]]
-        filename = '../reports/R' + str(i+1) + '_template.csv'
+        filename = '../results/templates/rule_based/R' + str(i+1) + '_rule_based_template.csv'
         create_csv(measure_list, rows_list, filename=filename)
 
 
