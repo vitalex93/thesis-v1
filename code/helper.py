@@ -1,5 +1,6 @@
 from textmodels import *
 from DocumentClassifier import *
+from keywords import *
 import pandas as pd
 import openpyxl
 from collections import Counter
@@ -442,7 +443,18 @@ def rule_based_templates(patterns_measures, patterns_rows, descriptions, n, path
         filename = '../results/templates/rule_based/R' + str(i+1) + '_rule_based_template.csv'
         create_csv(measure_list, rows_list, filename=filename)
 
-
+def kw_extraction(library, text, max_kw, stopwords, max_length=3, min_length=1, language='en', dedupLim=0.9):
+    kw_extractor = KeywordExtractor(language=language)
+    if library == 'yake':
+        yake_kw = kw_extractor.extract_yake(text=text, top=max_kw,  n=max_kw,
+                                             dedupLim=dedupLim, stopwords=stopwords)
+        yake_kw_sentence = ' '.join(yake_kw)
+        return yake_kw, yake_kw_sentence
+    elif library == 'rake':
+        rake_kw = kw_extractor.extract_rake(text=text, stopwords=stopwords, max_kw=max_kw,
+                                             max_length=max_length, min_length=min_length)
+        rake_kw_sentence = ' '.join(rake_kw)
+        return rake_kw, rake_kw_sentence
 
 
 
