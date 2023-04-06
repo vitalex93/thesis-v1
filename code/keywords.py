@@ -8,7 +8,7 @@ class KeywordExtractor:
         self.language = language
         #self.max_keywords = max_keywords
 
-    def extract_yake(self, text, stopwords, top, n=3, dedupLim=0.9):
+    def extract_yake(self, text, stopwords=None, top=10, n=3, dedupLim=0.9):
         kw_extractor = yake.KeywordExtractor(lan=self.language, top=top, n=n,
                                              dedupLim=dedupLim, stopwords=stopwords)
         keywords = kw_extractor.extract_keywords(text)

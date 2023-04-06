@@ -446,7 +446,7 @@ def rule_based_templates(patterns_measures, patterns_rows, descriptions, n, path
 def kw_extraction(library, text, max_kw, stopwords, max_length=3, min_length=1, language='en', dedupLim=0.9):
     kw_extractor = KeywordExtractor(language=language)
     if library == 'yake':
-        yake_kw = kw_extractor.extract_yake(text=text, top=max_kw,  n=max_kw,
+        yake_kw = kw_extractor.extract_yake(text=text, top=max_kw, 
                                              dedupLim=dedupLim, stopwords=stopwords)
         yake_kw_sentence = ' '.join(yake_kw)
         return yake_kw, yake_kw_sentence
