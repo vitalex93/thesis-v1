@@ -1,12 +1,25 @@
 from textmodels import *
 from DocumentClassifier import *
 from keywords import *
+from similarity import *
 import pandas as pd
 import openpyxl
 from collections import Counter
 import gensim
 import csv
 
+
+def get_similarity_scores_td(text, documents, algorithm, mode):
+    dsc = DocumentSimilarityCalculator(algorithm=algorithm, mode=mode)
+    similarity_scores = {}
+    for doc in documents:
+        similarity_score = dsc.calculate_similarity(text, doc) #cosine_similarity([text], [doc])[0][0]
+        similarity_scores[doc] = similarity_score
+
+    # Sort similarity scores in descending order
+    similarity_scores = {k: v for k, v in sorted(similarity_scores.items(), key=lambda item: item[1], reverse=True)}
+    
+    return similarity_scores
 
 def get_similarity_scores(text, documents, encoding_method,
                           version, tm, preprocessing=False, fin=False):
@@ -455,6 +468,15 @@ def kw_extraction(library, text, max_kw, stopwords, max_length=3, min_length=1, 
                                              max_length=max_length, min_length=min_length)
         rake_kw_sentence = ' '.join(rake_kw)
         return rake_kw, rake_kw_sentence
+    
+def build_kw_corpus(mode, descriptions, targets):
+    kwl = []
+    for i in range(len(descriptions)):
+        kwe = KeywordExtractor()
+        kws = kwe(mode=mode, text=descriptions[i])
+        kwl.append(kws)
+    kwl = kwl + targets
+    return kwl
 
 
 
