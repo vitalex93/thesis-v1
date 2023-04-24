@@ -456,11 +456,12 @@ def rule_based_templates(patterns_measures, patterns_rows, descriptions, n, path
         filename = '../results/templates/rule_based/R' + str(i+1) + '_rule_based_template.csv'
         create_csv(measure_list, rows_list, filename=filename)
 
-def kw_extraction(library, text, max_kw, stopwords, max_length=3, min_length=1, language='en', dedupLim=0.9):
+def kw_extraction(library, text, max_kw, stopwords, max_length=3, min_length=1, 
+                  n=2 ,language='en', dedupLim=0.9):
     kw_extractor = KeywordExtractor(language=language)
     if library == 'yake':
         yake_kw = kw_extractor.extract_yake(text=text, top=max_kw, 
-                                             dedupLim=dedupLim, stopwords=stopwords)
+                                             dedupLim=dedupLim, stopwords=stopwords, n=n)
         yake_kw_sentence = ' '.join(yake_kw)
         return yake_kw, yake_kw_sentence
     elif library == 'rake':
