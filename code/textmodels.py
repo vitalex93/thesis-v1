@@ -22,9 +22,9 @@ nltk.download('punkt')'''
 
 class TextModels:
 
-    def __init__(self, excel_path, columns,word2vec_version="word2vec-google-news-300", 
+    def __init__(self, word2vec_version="word2vec-google-news-300", 
                  word2vec_version_fin_path='C:/Users/avitsas/Documents/VECTORS/word.w2v.200.bin',w2v_window=5, w2v_workers=4,
-                 sbert_model="bert-base-nli-mean-tokens", cbow_window=5):
+                 sbert_model="bert-base-nli-mean-tokens", cbow_window=5, excel_path=None, columns=None):
         self.df = pd.read_excel(excel_path)
         self.columns = columns
         self.bow_model = None

@@ -366,6 +366,8 @@ def calculate_percentage(dict1, dict2, key1, key2, metric):
 
 def evaluation_metrics(metric, values, docs, encoding_method, version, tm, preprocessing, path, n, fin=False):
     ground_truth = {'R'+str(i+1):get_column_values(path, 'R'+str(i+1), 'C') for i in range(9)}
+    for key in ground_truth:
+        ground_truth[key] = [string.lower() for string in ground_truth[key]]
     metrics = {}
     for i in range(9):
         query = 'Q' + str(i+1)
@@ -470,11 +472,11 @@ def kw_extraction(library, text, max_kw, stopwords, max_length=3, min_length=1,
         rake_kw_sentence = ' '.join(rake_kw)
         return rake_kw, rake_kw_sentence
     
-def build_kw_corpus(mode, descriptions, targets):
+def build_kw_corpus(mode, descriptions, targets, max_kw, dedupLim, n, stopwords):
     kwl = []
     for i in range(len(descriptions)):
         kwe = KeywordExtractor()
-        kws = kwe(mode=mode, text=descriptions[i])
+        kws = kwe(mode=mode, text=descriptions[i], max_kw=max_kw, dedupLim=dedupLim, n=n, stopwords=stopwords)
         kwl.append(kws)
     kwl = kwl + targets
     return kwl
